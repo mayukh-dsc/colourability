@@ -17,21 +17,21 @@ export default [
     input: 'src/index.ts',
     output: [
       {
-        file: 'dist/overlay-filter.esm.js',
+        file: 'dist/colourability.esm.js',
         format: 'es',
         sourcemap: true,
       },
       {
-        file: 'dist/overlay-filter.umd.cjs',
+        file: 'dist/colourability.umd.cjs',
         format: 'umd',
-        name: 'OverlayFilter',
+        name: 'Colourability',
         exports: 'default',
         sourcemap: true,
       },
       {
-        file: 'dist/overlay-filter.min.js',
+        file: 'dist/colourability.min.js',
         format: 'iife',
-        name: 'OverlayFilter',
+        name: 'Colourability',
         exports: 'default',
         sourcemap: true,
         plugins: [terser()],

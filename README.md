@@ -1,23 +1,23 @@
-# overlay-filter
+# colourability
 
 Zero-dependency TypeScript library that applies **grayscale**, **color-blindness simulation**, and **daltonization** to any webpage using a single SVG [`feColorMatrix`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix) on the document root. Works over `<video>`, `<canvas>`, WebGL, and normal DOM content.
 
 ## Install
 
 ```bash
-npm install overlay-filter
+npm install colourability
 ```
 
 ## Usage
 
 ```typescript
-import OverlayFilter from 'overlay-filter';
+import Colourability from 'colourability';
 
-const filter = new OverlayFilter();
+const colourability = new Colourability();
 
-filter.apply('daltonize-deuteranopia', { intensity: 1 });
-filter.setIntensity(0.7);
-filter.remove();
+colourability.apply('daltonize-deuteranopia', { intensity: 1 });
+colourability.setIntensity(0.7);
+colourability.remove();
 ```
 
 ### Presets
@@ -36,7 +36,7 @@ filter.remove();
 
 ### API
 
-- `apply(name, options?)` — inject/update SVG filter and set `filter: url(#__of-active__)` on `<html>`
+- `apply(name, options?)` — inject/update SVG filter and set `filter: url(#__colourability-active__)` on `<html>`
 - `remove()` — remove SVG and restore the previous `filter` style
 - `setIntensity(value)` — adjust strength while a filter is active
 - `list()` — built-in preset names
@@ -44,11 +44,11 @@ filter.remove();
 
 ### Browser script (IIFE / UMD)
 
-After building, load `dist/overlay-filter.min.js` and use the global `OverlayFilter` constructor (see `package.json` `exports`).
+After building, load `dist/colourability.min.js` and use the global `Colourability` constructor (see `package.json` `exports`).
 
 ## How it works
 
-A hidden `<svg>` in `<head>` defines `<filter id="__of-active__">` with `color-interpolation-filters="linearRGB"`. The root element’s `filter` CSS property references that id. There is **no** full-screen overlay `<div>`; pointer events are unchanged.
+A hidden `<svg>` in `<head>` defines `<filter id="__colourability-active__">` with `color-interpolation-filters="linearRGB"`. The root element’s `filter` CSS property references that id. There is **no** full-screen overlay `<div>`; pointer events are unchanged.
 
 ## License
 

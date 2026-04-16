@@ -4,7 +4,7 @@ import type { FilterOptions, FilterState } from './types.js';
 
 export type { FilterOptions, FilterState } from './types.js';
 
-export default class OverlayFilter {
+export default class Colourability {
   private readonly doc: Document;
 
   private previousFilter: string | null = null;

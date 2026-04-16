@@ -1,10 +1,10 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 /** Single shared SVG root in `<head>` (see AGENTS.md). */
-export const SVG_ROOT_ID = '__overlay-filter-svg__';
+export const SVG_ROOT_ID = '__colourability-svg__';
 
 /** Referenced by `document.documentElement.style.filter = url(#...)`. */
-export const FILTER_ID = '__of-active__';
+export const FILTER_ID = '__colourability-active__';
 
 /**
  * Ensures the hidden SVG exists and sets the active `feColorMatrix` values.
@@ -15,7 +15,7 @@ export function ensureFilterSvg(matrixValues: string, doc: Document): void {
   if (existing !== null) {
     const fe = existing.querySelector('feColorMatrix');
     if (fe === null) {
-      throw new Error('overlay-filter: feColorMatrix missing inside shared SVG');
+      throw new Error('colourability: feColorMatrix missing inside shared SVG');
     }
     fe.setAttribute('values', matrixValues);
     return;
@@ -41,7 +41,7 @@ export function ensureFilterSvg(matrixValues: string, doc: Document): void {
 
   const head = doc.head;
   if (head === null) {
-    throw new Error('overlay-filter: document.head is null');
+    throw new Error('colourability: document.head is null');
   }
   head.appendChild(root);
 }
@@ -49,11 +49,11 @@ export function ensureFilterSvg(matrixValues: string, doc: Document): void {
 export function setMatrixValues(matrixValues: string, doc: Document): void {
   const root = doc.getElementById(SVG_ROOT_ID);
   if (root === null) {
-    throw new Error('overlay-filter: SVG not injected');
+    throw new Error('colourability: SVG not injected');
   }
   const fe = root.querySelector('feColorMatrix');
   if (fe === null) {
-    throw new Error('overlay-filter: feColorMatrix missing');
+    throw new Error('colourability: feColorMatrix missing');
   }
   fe.setAttribute('values', matrixValues);
 }

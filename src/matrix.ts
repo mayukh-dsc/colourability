@@ -115,7 +115,7 @@ export function interpolateMatrix(matrix: string, t: number): string {
     const a = identity[i];
     const b = target[i];
     if (a === undefined || b === undefined) {
-      throw new TypeError('overlay-filter: internal matrix index error');
+      throw new TypeError('colourability: internal matrix index error');
     }
     out.push(a + (b - a) * tt);
   }

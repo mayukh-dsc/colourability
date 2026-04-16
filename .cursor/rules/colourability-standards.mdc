@@ -1,9 +1,9 @@
 ---
-description: Core coding standards and architecture rules for the overlay-filter project
+description: Core coding standards and architecture rules for the colourability project
 alwaysApply: true
 ---
 
-# overlay-filter Standards
+# colourability Standards
 
 Always read `AGENTS.md` before making changes. It contains the full architecture, API contract, and known limitations.
 
@@ -12,7 +12,7 @@ Always read `AGENTS.md` before making changes. It contains the full architecture
 Every filter is a 4×5 matrix expressed as a `feColorMatrix`. There is no overlay div, no CSS shorthand filter strings, no blend modes. All 7 presets use the same pipeline:
 
 ```
-matrix string → <feColorMatrix values="..."> → filter: url(#__of-active__) on <html>
+matrix string → <feColorMatrix values="..."> → filter: url(#__colourability-active__) on <html>
 ```
 
 Do not add filters that cannot be expressed as a `feColorMatrix`.
@@ -40,7 +40,7 @@ it('interpolateMatrix at t=0 returns identity', () => {
 ## DOM Safety (Critical)
 
 - Save and restore `document.documentElement.style.filter` — never blindly overwrite it
-- Use a **single shared `<svg id="__overlay-filter-svg__">`** in `<head>` — update `values` in place, never inject multiple SVGs
+- Use a **single shared `<svg id="__colourability-svg__">`** in `<head>` — update `values` in place, never inject multiple SVGs
 - **Always set `color-interpolation-filters="linearRGB"`** on every `<filter>` — omitting it silently breaks all color-blindness filters
 - Remove the `<svg>` from `<head>` on `remove()`
 

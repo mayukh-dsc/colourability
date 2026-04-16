@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>overlay-filter demo</title>
+    <title>colourability demo</title>
     <style>
       :root {
         font-family: system-ui, sans-serif;
@@ -155,7 +155,7 @@
   </head>
   <body>
     <main>
-      <h1>overlay-filter demo</h1>
+      <h1>colourability demo</h1>
       <p class="hint">
         Run <code>npm run build</code>, then <code>npm run demo</code> from the repo root and open
         <code>/demo/index.html</code> so the bundled script loads correctly.
@@ -227,13 +227,13 @@
       </div>
       <div class="controls" id="controls" aria-label="Filter presets"></div>
     </main>
-    <script src="../dist/overlay-filter.min.js"></script>
+    <script src="../dist/colourability.min.js"></script>
     <script>
       (function () {
         const controls = document.getElementById("controls");
         if (!controls) return;
 
-        const overlay = new OverlayFilter();
+        const colourability = new Colourability();
 
         function formatLabel(name) {
           return name
@@ -252,14 +252,14 @@
           });
         }
 
-        overlay.list().forEach(function (name) {
+        colourability.list().forEach(function (name) {
           const btn = document.createElement("button");
           btn.type = "button";
           btn.setAttribute("data-filter", name);
           btn.setAttribute("aria-pressed", "false");
           btn.textContent = formatLabel(name);
           btn.addEventListener("click", function () {
-            overlay.apply(name);
+            colourability.apply(name);
             setPressed(name);
           });
           controls.appendChild(btn);
@@ -269,7 +269,7 @@
         none.type = "button";
         none.textContent = "None";
         none.addEventListener("click", function () {
-          overlay.remove();
+          colourability.remove();
           setPressed(null);
         });
         controls.appendChild(none);

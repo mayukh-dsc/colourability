@@ -1,12 +1,12 @@
 import { describe, expect, it, beforeEach, afterEach } from 'vitest';
-import OverlayFilter from '../index.js';
+import Colourability from '../index.js';
 
-describe('OverlayFilter', () => {
-  let filter: OverlayFilter;
+describe('Colourability', () => {
+  let filter: Colourability;
 
   beforeEach(() => {
     document.documentElement.style.filter = '';
-    filter = new OverlayFilter();
+    filter = new Colourability();
   });
 
   afterEach(() => {

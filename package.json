@@ -1,16 +1,16 @@
 {
-  "name": "overlay-filter",
+  "name": "colourability",
   "version": "0.1.0",
   "description": "Color-blindness and grayscale filters for any webpage via SVG feColorMatrix",
   "type": "module",
-  "main": "./dist/overlay-filter.umd.cjs",
-  "module": "./dist/overlay-filter.esm.js",
+  "main": "./dist/colourability.umd.cjs",
+  "module": "./dist/colourability.esm.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/overlay-filter.esm.js",
-      "require": "./dist/overlay-filter.umd.cjs"
+      "import": "./dist/colourability.esm.js",
+      "require": "./dist/colourability.umd.cjs"
     }
   },
   "files": [
