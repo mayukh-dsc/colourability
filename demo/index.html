@@ -189,12 +189,11 @@
             />
           </figure>
           <div class="showcase-canvas-wrap">
-            <h5>CanvasPalette</h5>
             <canvas
               id="demo-canvas"
               width="480"
               height="160"
-              aria-label="Color grid drawn on canvas"
+              aria-label="CanvasPalette: color grid drawn on canvas"
             ></canvas>
           </div>
         </div>
@@ -288,6 +287,19 @@
           ctx.fillStyle = color;
           ctx.fillRect(col * cellW, row * cellH, cellW, cellH);
         });
+
+        const label = "Canvas Palette";
+        ctx.font = "bold 22px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        const tx = w / 2;
+        const ty = 10;
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.55)";
+        ctx.strokeText(label, tx, ty);
+        ctx.fillStyle = "#fafafa";
+        ctx.fillText(label, tx, ty);
       })();
     </script>
     <script>
