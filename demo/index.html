@@ -26,13 +26,30 @@
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
-        align-items: stretch;
+        /* stretch makes the figure match the aside height, leaving grey below the image */
+        align-items: flex-start;
         margin-bottom: 1.25rem;
       }
 
-      .showcase-figure {
+      .showcase-left {
         flex: 1 1 16rem;
         min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .showcase-canvas-wrap {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background: #e4e4e7;
+        box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+      }
+
+      .showcase-canvas-wrap canvas {
+        display: block;
+        width: 100%;
+        height: auto;
       }
 
       .palette {
@@ -50,9 +67,11 @@
         border-radius: 0.375rem;
         overflow: hidden;
         background: #0a0a0a;
-        aspect-ratio: 9 / 16;
         position: relative;
-        max-height: 14rem;
+        /* Full width of the palette; height from Shorts aspect (9:16). max-height + aspect-ratio
+           was shrinking the box width and leaving a gutter beside the iframe. */
+        width: 100%;
+        aspect-ratio: 9 / 16;
       }
 
       .palette-video iframe {
@@ -157,19 +176,30 @@
     <main>
       <h1>colourability demo</h1>
       <p class="hint">
-        Run <code>npm run build</code>, then <code>npm run demo</code> from the repo root and open
-        <code>/demo/index.html</code> so the bundled script loads correctly.
+        Colourability applies the same root filter to the whole page, so images, video, canvas, and the rest of the DOM are affected together.
       </p>
       <div class="showcase">
-        <figure class="showcase-figure">
-          <img
-            src="https://cataas.com/cat?width=480"
-            alt="A cat"
-            width="480"
-            height="480"
-          />
-        </figure>
+        <div class="showcase-left">
+          <figure class="showcase-figure">
+            <img
+              src="https://cataas.com/cat?width=480&height=480"
+              alt="A cat"
+              width="480"
+              height="480"
+            />
+          </figure>
+          <div class="showcase-canvas-wrap">
+            <h5>CanvasPalette</h5>
+            <canvas
+              id="demo-canvas"
+              width="480"
+              height="160"
+              aria-label="Color grid drawn on canvas"
+            ></canvas>
+          </div>
+        </div>
         <aside class="palette" aria-label="Video and reference colors">
+          <h2>Video</h2>
           <div class="palette-video">
             <iframe
               src="https://www.youtube.com/embed/G0rAyAQOtjU"
@@ -180,7 +210,7 @@
               referrerpolicy="strict-origin-when-cross-origin"
             ></iframe>
           </div>
-          <h2>Palette</h2>
+          <h2>HTML Palette</h2>
           <div class="palette-grid">
             <div class="palette-item">
               <div class="palette-swatch" style="background: #e11d48"></div>
@@ -227,7 +257,39 @@
       </div>
       <div class="controls" id="controls" aria-label="Filter presets"></div>
     </main>
-    <script src="../dist/colourability.min.js"></script>
+    <script src="/dist/colourability.min.js"></script>
+    <script>
+      (function () {
+        const canvas = document.getElementById("demo-canvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        const colors = [
+          "#e11d48",
+          "#16a34a",
+          "#2563eb",
+          "#eab308",
+          "#a855f7",
+          "#ea580c",
+          "#14b8a6",
+          "#f4a7b9",
+          "#78716c",
+          "#fafafa",
+        ];
+        const cols = 5;
+        const rows = 2;
+        const w = canvas.width;
+        const h = canvas.height;
+        const cellW = w / cols;
+        const cellH = h / rows;
+        colors.forEach(function (color, i) {
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          ctx.fillStyle = color;
+          ctx.fillRect(col * cellW, row * cellH, cellW, cellH);
+        });
+      })();
+    </script>
     <script>
       (function () {
         const controls = document.getElementById("controls");
