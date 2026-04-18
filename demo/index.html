@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>colourability demo</title>
+    <link rel="icon" href="../assets/logo.png" type="image/png" />
     <style>
       :root {
         font-family: system-ui, sans-serif;
@@ -15,6 +16,23 @@
       body {
         margin: 0;
         padding: 1.5rem;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .brand img {
+        width: 3rem;
+        height: 3rem;
+        flex-shrink: 0;
+      }
+
+      .brand h1 {
+        margin: 0;
       }
 
       main {
@@ -174,7 +192,16 @@
   </head>
   <body>
     <main>
-      <h1>colourability demo</h1>
+      <header class="brand">
+        <img
+          src="../assets/logo.png"
+          alt=""
+          width="48"
+          height="48"
+          decoding="async"
+        />
+        <h1>colourability demo</h1>
+      </header>
       <p class="hint">
         Colourability applies the same root filter to the whole page, so images, video, canvas, and the rest of the DOM are affected together.
       </p>

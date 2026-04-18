@@ -14,14 +14,15 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "assets/logo.png"
   ],
   "scripts": {
     "build": "rollup -c rollup.config.js && tsc --emitDeclarationOnly --declaration --declarationMap --project tsconfig.build.json",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "demo": "npx --yes serve demo -p 4173"
+    "demo": "npx --yes serve . -p 4173"
   },
   "keywords": [
     "accessibility",

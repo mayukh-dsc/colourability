@@ -1,6 +1,23 @@
+<div align="center">
+  <img src="assets/logo.png" alt="colourability logo: c11y wordmark with two coloured dots" width="128" height="128" />
+</div>
+
 # colourability
 
-Zero-dependency TypeScript library that applies **grayscale**, **color-blindness simulation**, **daltonization**, and optional **stylized** matrices to any webpage using a single SVG [`feColorMatrix`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix) on the document root. Works over `<video>`, `<canvas>`, WebGL, and normal DOM content.
+**Test and improve color accessibility on real webpages** with one tiny, zero-dependency TypeScript library.
+
+`colourability` applies color transformations at the page level using a single SVG [`feColorMatrix`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix), so it affects:
+
+- regular DOM content
+- `<video>`
+- `<canvas>`
+- WebGL output
+
+Use it to:
+- simulate common color-vision deficiencies (`protanopia`, `deuteranopia`, `tritanopia`)
+- apply daltonization-style compensation matrices
+- tune strength live with intensity (`0..1`)
+- run custom 20-value matrices when needed
 
 ## Install
 
@@ -15,12 +32,86 @@ import Colourability from 'colourability';
 
 const colourability = new Colourability();
 
-colourability.apply('daltonizeColorBlindness/deuteranopia', { intensity: 1 });
+// Simulate deuteranopia at full strength
+colourability.apply('simulateColorBlindness/deuteranopia', { intensity: 1 });
+
+// Tune effect strength while active
 colourability.setIntensity(0.7);
+
+// Remove filter and restore prior page state
 colourability.remove();
 ```
 
-### Custom matrix
+---
+
+## Color-blindness workflows
+
+### 1) Simulate what users may see
+
+```typescript
+import Colourability from 'colourability';
+
+const c11y = new Colourability();
+
+// Red-cone deficiency simulation
+c11y.apply('simulateColorBlindness/protanopia');
+
+// Green-cone deficiency simulation
+c11y.apply('simulateColorBlindness/deuteranopia');
+
+// Blue-cone deficiency simulation
+c11y.apply('simulateColorBlindness/tritanopia');
+```
+
+### 2) Apply daltonization-style compensation
+
+```typescript
+import Colourability from 'colourability';
+
+const c11y = new Colourability();
+
+// Compensation preset (linear heuristic matrix)
+colourability.apply('daltonizeColorBlindness/deuteranopia', { intensity: 1 });
+c11y.setIntensity(0.85);
+```
+
+### 3) Compare quickly with a simple toggle
+
+```typescript
+import Colourability from 'colourability';
+
+const c11y = new Colourability();
+
+c11y.apply('simulateColorBlindness/deuteranopia');
+
+// ... inspect UI ...
+
+c11y.remove();
+```
+
+---
+
+## Built-in presets
+
+Built-in ids use `category/subname`:
+
+| Id | Purpose |
+|----|---------|
+| `simulateColorBlindness/protanopia` | Simulate red-cone (L) deficiency |
+| `simulateColorBlindness/deuteranopia` | Simulate green-cone (M) deficiency |
+| `simulateColorBlindness/tritanopia` | Simulate blue-cone (S) deficiency |
+| `daltonizeColorBlindness/protanopia` | Compensation heuristic (`2I - M_sim`) |
+| `daltonizeColorBlindness/deuteranopia` | Compensation heuristic (`2I - M_sim`) |
+| `daltonizeColorBlindness/tritanopia` | Compensation heuristic (`2I - M_sim`) |
+| `visual/grayscale` | BT.709 luminance grayscale |
+| `fun/sepia` | Stylized sepia |
+| `fun/invert` | Stylized invert |
+
+`intensity` is always `0..1` and interpolates each matrix coefficient toward identity.
+
+---
+
+## Custom matrix
 
 Pass a 20-number `feColorMatrix` `values` string (row-major, same format as built-ins). For example, the identity (no-op) matrix:
 
@@ -34,25 +125,7 @@ const c = new Colourability();
 c.applyMatrix(IDENTITY, { intensity: 0.5 });
 ```
 
-### Presets
-
-Built-in ids use `category/subname`:
-
-| Id | Description |
-|----|-------------|
-| `visual/grayscale` | BT.709 luminance |
-| `simulateColorBlindness/protanopia` | Red-cone (L) deficiency — simulation |
-| `simulateColorBlindness/deuteranopia` | Green-cone (M) deficiency — simulation |
-| `simulateColorBlindness/tritanopia` | Blue-cone (S) deficiency — simulation (Machado-style matrix) |
-| `daltonizeColorBlindness/protanopia` | Compensation heuristic (`2I − M_sim`) |
-| `daltonizeColorBlindness/deuteranopia` | Compensation heuristic |
-| `daltonizeColorBlindness/tritanopia` | Compensation heuristic |
-| `fun/sepia` | Sepia-style RGB mix |
-| `fun/invert` | RGB invert with per-channel offset |
-
-`intensity` is in `0…1` (per-coefficient interpolation toward the identity matrix).
-
-### API
+## API
 
 - `apply(name, options?)` — inject/update SVG filter and set `filter: url(#__colourability-active__)` on `<html>`
 - `applyMatrix(matrix, options?)` — same as `apply`, but with a raw 20-coefficient matrix string
@@ -61,17 +134,30 @@ Built-in ids use `category/subname`:
 - `list()` — built-in preset ids
 - `getState()` — `{ active, customMatrix, options }` — `active` is set for built-ins; `customMatrix` is set when `applyMatrix` was used
 
-### Versioning (0.x)
+---
 
-While the major version is **0**, minor releases may include breaking API or preset-id changes. Pin the version range you need for production.
+## Why this approach works
 
-### Browser script (IIFE / UMD)
+A hidden `<svg>` in `<head>` defines `<filter id="__colourability-active__">` with `color-interpolation-filters="linearRGB"`.
+The root element then references it via CSS `filter: url(#__colourability-active__)`.
 
-After building, load `dist/colourability.min.js` and use the global `Colourability` constructor (see `package.json` `exports`).
+This means:
+- one consistent mechanism for grayscale, simulation, and daltonization
+- no fullscreen overlay hacks
+- pointer events and interaction model stay natural
 
-## How it works
+---
 
-A hidden `<svg>` in `<head>` defines `<filter id="__colourability-active__">` with `color-interpolation-filters="linearRGB"`. The root element’s `filter` CSS property references that id. There is **no** full-screen overlay `<div>`; pointer events are unchanged.
+## Browser script (IIFE / UMD)
+
+After building, load `dist/colourability.min.js` and use the global `Colourability` constructor.
+
+---
+
+## Versioning (0.x)
+
+While the major version is `0`, minor releases may include breaking API or preset-id changes.
+Pin the version range you need for production.
 
 ## Contributing
 
