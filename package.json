@@ -1,7 +1,11 @@
 {
   "name": "colourability",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Color-blindness and grayscale filters for any webpage via SVG feColorMatrix",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mayukh-dsc/colourability.git"
+  },
   "type": "module",
   "main": "./dist/colourability.umd.cjs",
   "module": "./dist/colourability.esm.js",
