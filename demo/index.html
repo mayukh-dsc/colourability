@@ -162,10 +162,33 @@
       }
 
       .controls {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.25rem;
+        align-items: start;
+        width: 100%;
+      }
+
+      .control-group {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 0.5rem;
-        align-items: center;
+        min-width: 0;
+      }
+
+      .control-group h3 {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #71717a;
+        margin: 0;
+      }
+
+      .control-group-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
       }
 
       .controls button {
@@ -176,6 +199,9 @@
         border-radius: 0.375rem;
         background: #fff;
         cursor: pointer;
+        text-align: left;
+        overflow-wrap: break-word;
+        hyphens: auto;
       }
 
       .controls button:hover {
@@ -359,29 +385,92 @@
             const v = btn.getAttribute("data-filter");
             btn.setAttribute("aria-pressed", v === name ? "true" : "false");
           });
+          const noneBtn = controls.querySelector("button.control-none");
+          if (noneBtn) {
+            noneBtn.setAttribute(
+              "aria-pressed",
+              name == null ? "true" : "false"
+            );
+          }
         }
 
-        colourability.list().forEach(function (name) {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.setAttribute("data-filter", name);
-          btn.setAttribute("aria-pressed", "false");
-          btn.textContent = formatLabel(name);
-          btn.addEventListener("click", function () {
-            colourability.apply(name);
-            setPressed(name);
+        const available = new Set(colourability.list());
+
+        const groups = [
+          {
+            id: "controls-group-simulate",
+            title: "Color blindness simulations",
+            filters: [
+              "simulateColorBlindness/protanopia",
+              "simulateColorBlindness/deuteranopia",
+              "simulateColorBlindness/tritanopia",
+            ],
+          },
+          {
+            id: "controls-group-daltonize",
+            title: "Color blindness daltonized",
+            filters: [
+              "daltonizeColorBlindness/protanopia",
+              "daltonizeColorBlindness/deuteranopia",
+              "daltonizeColorBlindness/tritanopia",
+            ],
+          },
+          {
+            id: "controls-group-fun",
+            title: "Fun filters",
+            filters: ["visual/grayscale", "fun/invert", "fun/sepia"],
+          },
+          {
+            id: "controls-group-none",
+            title: "Clear filter",
+            filters: [],
+          },
+        ];
+
+        groups.forEach(function (group) {
+          const section = document.createElement("section");
+          section.className = "control-group";
+          section.setAttribute("aria-labelledby", group.id);
+
+          const heading = document.createElement("h3");
+          heading.id = group.id;
+          heading.textContent = group.title;
+          section.appendChild(heading);
+
+          const buttonWrap = document.createElement("div");
+          buttonWrap.className = "control-group-buttons";
+
+          group.filters.forEach(function (name) {
+            if (!available.has(name)) return;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.setAttribute("data-filter", name);
+            btn.setAttribute("aria-pressed", "false");
+            btn.textContent = formatLabel(name);
+            btn.addEventListener("click", function () {
+              colourability.apply(name);
+              setPressed(name);
+            });
+            buttonWrap.appendChild(btn);
           });
-          controls.appendChild(btn);
+
+          if (group.id === "controls-group-none") {
+            const none = document.createElement("button");
+            none.type = "button";
+            none.className = "control-none";
+            none.textContent = "None";
+            none.addEventListener("click", function () {
+              colourability.remove();
+              setPressed(null);
+            });
+            buttonWrap.appendChild(none);
+          }
+
+          section.appendChild(buttonWrap);
+          controls.appendChild(section);
         });
 
-        const none = document.createElement("button");
-        none.type = "button";
-        none.textContent = "None";
-        none.addEventListener("click", function () {
-          colourability.remove();
-          setPressed(null);
-        });
-        controls.appendChild(none);
+        setPressed(null);
       })();
     </script>
   </body>

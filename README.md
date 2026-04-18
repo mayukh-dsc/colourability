@@ -2,6 +2,12 @@
   <img src="assets/logo.png" alt="colourability logo: c11y wordmark with two coloured dots" width="128" height="128" />
 </div>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/colourability"><img src="https://img.shields.io/npm/v/colourability" alt="npm package version on npmjs.com" /></a>
+  <a href="https://github.com/mayukh-dsc/colourability/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/mayukh-dsc/colourability/ci.yml?label=CI" alt="CI workflow status on GitHub Actions" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+</p>
+
 # colourability
 
 **Test and improve color accessibility on real webpages** with one tiny, zero-dependency TypeScript library.
@@ -71,7 +77,7 @@ import Colourability from 'colourability';
 const c11y = new Colourability();
 
 // Compensation preset (linear heuristic matrix)
-colourability.apply('daltonizeColorBlindness/deuteranopia', { intensity: 1 });
+c11y.apply('daltonizeColorBlindness/deuteranopia', { intensity: 1 });
 c11y.setIntensity(0.85);
 ```
 
