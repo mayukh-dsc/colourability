@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Opt into Node 24 for Actions JS (checkout, setup-node) per GitHub runner deprecation timeline.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify package version matches git tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          VER=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "$VER" ]; then
+            echo "::error title=Version mismatch::package.json version ($VER) does not match tag (v$TAG). Bump version, commit, then tag v$VER."
+            exit 1
+          fi
+          echo "OK: tag v$TAG matches package.json version $VER"
+
+      - name: Verify npm authentication
+        run: npm whoami
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Run full test suite
+        run: npm run typecheck && npm run test && npm run build
+
+      - name: Publish with provenance
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
