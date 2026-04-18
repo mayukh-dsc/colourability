@@ -2,28 +2,39 @@
   <img src="assets/logo.png" alt="colourability logo: c11y wordmark with two coloured dots" width="128" height="128" />
 </div>
 
+
+# colourability
+
 <p align="center">
   <a href="https://www.npmjs.com/package/colourability"><img src="https://img.shields.io/npm/v/colourability" alt="npm package version on npmjs.com" /></a>
   <a href="https://github.com/mayukh-dsc/colourability/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/mayukh-dsc/colourability/ci.yml?label=CI" alt="CI workflow status on GitHub Actions" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
 </p>
 
-# colourability
-
 **Test and improve color accessibility on real webpages** with one tiny, zero-dependency TypeScript library.
 
-`colourability` applies color transformations at the page level using a single SVG [`feColorMatrix`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix), so it affects:
+`colourability` applies color transformations at the page level using a single SVG [`feColorMatrix`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix), so it affects the entire *DOM including Videos and Canvas elements*. 
 
-- regular DOM content
-- `<video>`
-- `<canvas>`
-- WebGL output
 
 Use it to:
 - simulate common color-vision deficiencies (`protanopia`, `deuteranopia`, `tritanopia`)
 - apply daltonization-style compensation matrices
 - tune strength live with intensity (`0..1`)
 - run custom 20-value matrices when needed
+
+## See it in action
+
+<p align="center">
+  <img
+    src="demo/demo_colourability.gif"
+    alt="Colourability demo: one root filter affects the cat image, canvas palette, HTML color swatches, and video together; buttons for color-blindness simulation, daltonization, and fun filters."
+    width="768"
+  />
+</p>
+
+*The interactive demo applies the same filter to the whole page—images, `<video>`, `<canvas>`, and the rest of the DOM—so you can compare simulation and daltonization in context.*
+
+The recording lives next to the live demo in `demo/`. It is **not** included in the npm package (`package.json` `"files"`), so the published tarball stays small; GitHub renders it from the repository.
 
 ## Install
 
@@ -36,13 +47,13 @@ npm install colourability
 ```typescript
 import Colourability from 'colourability';
 
-const colourability = new Colourability();
+const c11y = new Colourability();
 
 // Simulate deuteranopia at full strength
-colourability.apply('simulateColorBlindness/deuteranopia', { intensity: 1 });
+c11y.apply('simulateColorBlindness/deuteranopia', { intensity: 1 });
 
 // Tune effect strength while active
-colourability.setIntensity(0.7);
+c11y.setIntensity(0.7);
 
 // Remove filter and restore prior page state
 colourability.remove();
@@ -55,9 +66,6 @@ colourability.remove();
 ### 1) Simulate what users may see
 
 ```typescript
-import Colourability from 'colourability';
-
-const c11y = new Colourability();
 
 // Red-cone deficiency simulation
 c11y.apply('simulateColorBlindness/protanopia');
@@ -72,9 +80,6 @@ c11y.apply('simulateColorBlindness/tritanopia');
 ### 2) Apply daltonization-style compensation
 
 ```typescript
-import Colourability from 'colourability';
-
-const c11y = new Colourability();
 
 // Compensation preset (linear heuristic matrix)
 c11y.apply('daltonizeColorBlindness/deuteranopia', { intensity: 1 });
@@ -84,9 +89,6 @@ c11y.setIntensity(0.85);
 ### 3) Compare quickly with a simple toggle
 
 ```typescript
-import Colourability from 'colourability';
-
-const c11y = new Colourability();
 
 c11y.apply('simulateColorBlindness/deuteranopia');
 
@@ -122,13 +124,11 @@ Built-in ids use `category/subname`:
 Pass a 20-number `feColorMatrix` `values` string (row-major, same format as built-ins). For example, the identity (no-op) matrix:
 
 ```typescript
-import Colourability from 'colourability';
 
 const IDENTITY =
   '1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0';
 
-const c = new Colourability();
-c.applyMatrix(IDENTITY, { intensity: 0.5 });
+c11y.applyMatrix(IDENTITY, { intensity: 0.5 });
 ```
 
 ## API
