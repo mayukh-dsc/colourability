@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { FILTERS } from '../filters/index.js';
 import {
-  FILTERS,
   GRAYSCALE,
   IDENTITY_MATRIX,
   interpolateMatrix,
@@ -8,8 +8,8 @@ import {
 } from '../matrix.js';
 
 describe('FILTERS', () => {
-  it('has exactly 7 presets', () => {
-    expect(Object.keys(FILTERS).length).toBe(7);
+  it('has expected built-in count', () => {
+    expect(Object.keys(FILTERS).length).toBe(9);
   });
 
   it.each(Object.keys(FILTERS))('%s has 20 valid coefficients', (name) => {
@@ -20,6 +20,12 @@ describe('FILTERS', () => {
     const coeffs = parseMatrixValues(m);
     expect(coeffs.length).toBe(20);
   });
+
+  it('uses namespaced ids (category/subname)', () => {
+    for (const key of Object.keys(FILTERS)) {
+      expect(key).toMatch(/^[a-zA-Z]+\/[a-zA-Z0-9]+$/u);
+    }
+  });
 });
 
 describe('interpolateMatrix', () => {
@@ -28,9 +34,7 @@ describe('interpolateMatrix', () => {
   });
 
   it('returns original matrix at t=1', () => {
-    expect(parseMatrixValues(interpolateMatrix(GRAYSCALE, 1))).toEqual(
-      parseMatrixValues(GRAYSCALE),
-    );
+    expect(parseMatrixValues(interpolateMatrix(GRAYSCALE, 1))).toEqual(parseMatrixValues(GRAYSCALE));
   });
 
   it('clamps t outside 0–1', () => {

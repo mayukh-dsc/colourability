@@ -311,11 +311,19 @@
 
         function formatLabel(name) {
           return name
-            .split("-")
-            .map(function (part) {
-              return part.charAt(0).toUpperCase() + part.slice(1);
+            .split("/")
+            .map(function (segment) {
+              return segment
+                .replace(/([a-z])([A-Z])/g, "$1 $2")
+                .split(" ")
+                .map(function (word) {
+                  return (
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                  );
+                })
+                .join(" ");
             })
-            .join(" ");
+            .join(" — ");
         }
 
         function setPressed(name) {

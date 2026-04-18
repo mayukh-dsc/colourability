@@ -9,6 +9,6 @@
     "outDir": "dist",
     "types": []
   },
-  "include": ["src/index.ts", "src/types.ts", "src/matrix.ts", "src/overlay.ts"],
+  "include": ["src/index.ts", "src/types.ts", "src/matrix.ts", "src/overlay.ts", "src/filters/**/*.ts"],
   "exclude": ["src/**/*.test.ts", "src/__tests__/**"]
 }

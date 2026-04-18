@@ -1,4 +1,5 @@
-import { FILTERS, interpolateMatrix } from './matrix.js';
+import { FILTERS } from './filters/index.js';
+import { interpolateMatrix, parseMatrixValues } from './matrix.js';
 import { FILTER_ID, ensureFilterSvg, removeFilterSvg, setMatrixValues } from './overlay.js';
 import type { FilterOptions, FilterState } from './types.js';
 
@@ -9,7 +10,9 @@ export default class Colourability {
 
   private previousFilter: string | null = null;
 
-  private active: string | null = null;
+  private activePreset: string | null = null;
+
+  private customBaseMatrix: string | null = null;
 
   private intensity = 1;
 
@@ -23,29 +26,61 @@ export default class Colourability {
       throw new Error(`Unknown filter: ${name}`);
     }
 
-    const nextIntensity = options?.intensity ?? 1;
-    this.intensity = Math.min(1, Math.max(0, nextIntensity));
-    const matrix = interpolateMatrix(base, this.intensity);
-
-    if (this.active === null) {
+    if (this.activePreset === null && this.customBaseMatrix === null) {
       this.previousFilter = this.doc.documentElement.style.filter;
     }
 
+    const nextIntensity = options?.intensity ?? 1;
+    this.intensity = Math.min(1, Math.max(0, nextIntensity));
+    this.customBaseMatrix = null;
+    this.activePreset = name;
+    const matrix = interpolateMatrix(base, this.intensity);
+
     ensureFilterSvg(matrix, this.doc);
     this.doc.documentElement.style.filter = `url(#${FILTER_ID})`;
-    this.active = name;
+    return this;
+  }
+
+  /**
+   * Apply a raw 20-coefficient feColorMatrix string (same format as built-in presets).
+   * `setIntensity` interpolates toward identity from this base matrix.
+   */
+  public applyMatrix(matrix: string, options?: FilterOptions): this {
+    const normalized = matrix.trim().replace(/\s+/g, ' ');
+    parseMatrixValues(normalized);
+
+    if (this.activePreset === null && this.customBaseMatrix === null) {
+      this.previousFilter = this.doc.documentElement.style.filter;
+    }
+
+    const nextIntensity = options?.intensity ?? 1;
+    this.intensity = Math.min(1, Math.max(0, nextIntensity));
+    this.activePreset = null;
+    this.customBaseMatrix = normalized;
+    const applied = interpolateMatrix(normalized, this.intensity);
+
+    ensureFilterSvg(applied, this.doc);
+    this.doc.documentElement.style.filter = `url(#${FILTER_ID})`;
     return this;
   }
 
   public setIntensity(value: number): this {
-    if (this.active !== null) {
-      /* `active` is only ever set from apply() after a successful FILTERS lookup. */
-      const base = FILTERS[this.active]!;
-      this.intensity = Math.min(1, Math.max(0, value));
-      const matrix = interpolateMatrix(base, this.intensity);
-      setMatrixValues(matrix, this.doc);
+    const base = this.resolveBaseMatrix();
+    if (base === null) {
+      return this;
     }
+    this.intensity = Math.min(1, Math.max(0, value));
+    const matrix = interpolateMatrix(base, this.intensity);
+    setMatrixValues(matrix, this.doc);
     return this;
+  }
+
+  private resolveBaseMatrix(): string | null {
+    if (this.activePreset !== null) {
+      const preset = FILTERS[this.activePreset];
+      return preset ?? null;
+    }
+    return this.customBaseMatrix;
   }
 
   public remove(): this {
@@ -56,7 +91,8 @@ export default class Colourability {
     }
     removeFilterSvg(this.doc);
     this.previousFilter = null;
-    this.active = null;
+    this.activePreset = null;
+    this.customBaseMatrix = null;
     this.intensity = 1;
     return this;
   }
@@ -66,10 +102,11 @@ export default class Colourability {
   }
 
   public getState(): FilterState {
-    const opts: FilterOptions =
-      this.active === null ? {} : { intensity: this.intensity };
+    const hasFilter = this.activePreset !== null || this.customBaseMatrix !== null;
+    const opts: FilterOptions = hasFilter ? { intensity: this.intensity } : {};
     return {
-      active: this.active,
+      active: this.activePreset,
+      customMatrix: this.customBaseMatrix,
       options: opts,
     };
   }
